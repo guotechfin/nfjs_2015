@@ -4,7 +4,10 @@ jobs:
   - task: say-hello
     config:
       platform: linux
-      image: "docker:///busybox"
+      image_resource:
+        type: docker-image
+        source:
+          repository: busybox
       run:
         path: echo
-        args: ["Hello, world!"]
+        args: ["Hello, World!"]
