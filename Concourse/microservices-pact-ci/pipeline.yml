@@ -11,9 +11,9 @@ jobs:
     - task: generate-pact
       file: microservices-pact/microservices-pact-consumer/task.yml
     - put: pact
-      params: {from: microservices-pact-consumer/target/pacts/Foo_Consumer-Foo_Provider.json}
+      params: {file: pacts/Foo_Consumer-Foo_Provider.json}
     - put: foo-consumer
-      params: {from: microservices-pact-consumer/build/libs/microservices-pact-consumer-.*.jar$}
+      params: {file: libs/microservices-pact-consumer-*.jar}
     - put: foo-consumer-version
       params: {file: foo-consumer-version/number}
 
@@ -49,7 +49,7 @@ jobs:
   - task: verify-pact
     file: microservices-pact/microservices-pact-provider/task.yml
   - put: foo-provider
-    params: {from: microservices-pact-provider/build/libs/microservices-pact-provider-.*.jar$}
+    params: {file: provider-libs/microservices-pact-provider-*.jar}
   - put: foo-provider-version
     params: {file: foo-provider-version/number}
 
@@ -100,7 +100,7 @@ resources:
     access_key_id: {{access_key_id}}
     secret_access_key: {{secret_access_key}}
     bucket: concourse-pact
-    regexp: microservices-pact-consumer-.*.jar$
+    regexp: microservices-pact-consumer-(.*).jar$
 
 - name: foo-provider-version
   type: semver
@@ -117,7 +117,7 @@ resources:
     access_key_id: {{access_key_id}}
     secret_access_key: {{secret_access_key}}
     bucket: concourse-pact
-    regexp: microservices-pact-provider-.*.jar$
+    regexp: microservices-pact-provider-(.*).jar$
 
 - name: pws-deploy
   type: cf
