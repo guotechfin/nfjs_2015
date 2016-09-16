@@ -1,10 +1,10 @@
-footer: © 2015 Matt Stine
+footer: © 2016 Matt Stine
 slidenumbers: true
 autoscale: true
 
 # [fit] Concourse:
 # [fit] CI that scales with your project
-![fit](images/concourse.png)
+![](images/concourse-new-small.jpg)
 
 ---
 
@@ -12,8 +12,8 @@ autoscale: true
 # Me
 
 Matt Stine [@mstine](http://twitter.com/mstine)
-Senior Product Manager
-Pivotal
+Strategic Product Owner - Spring Portfolio
+Pivotal Software, Inc.
 [matt.stine@gmail.com](mailto:matt.stine@gmail.com)
 
 ---
@@ -41,7 +41,7 @@ FREE - Compliments of Pivotal
 ---
 
 # [fit] Why?
-![fit](images/concourse.png)
+![](images/concourse-new-small.jpg)
 
 ---
 
@@ -98,7 +98,7 @@ http://bosh.io
 ---
 
 # [fit] Concepts
-![fit](images/concourse.png)
+![](images/concourse-new-small.jpg)
 
 ---
 
@@ -111,7 +111,7 @@ http://bosh.io
 ---
 
 # [fit] Tasks
-# _execution of a script in an isolated environment with dependent resources made available to it_
+# [fit] _execution of a script in an isolated environment with dependent resources made available to it_
 
 ---
 
@@ -122,6 +122,9 @@ image: docker:///java#8
 inputs:
 - name: microservices-pact
 - name: foo-consumer-version
+outputs:
+- name: pacts
+- name: libs
 params:
     TERM: dumb
     VERSION_FILE_PATH: foo-consumer-version
@@ -149,6 +152,8 @@ inputs:
 - name: microservices-pact
 - name: pact
 - name: foo-provider-version
+outputs:
+- name: provider-libs
 params:
   TERM: dumb
   PACT_FILE: ../pact/Foo_Consumer-Foo_Provider.json
@@ -165,7 +170,7 @@ run:
 ---
 
 # [fit] Resources
-# _data: inputs/outputs_
+# [fit] _data: inputs/outputs_
 
 ---
 
@@ -198,7 +203,7 @@ run:
     access_key_id: {{access_key_id}}
     secret_access_key: {{secret_access_key}}
     bucket: concourse-pact
-    regexp: microservices-pact-consumer-.*.jar$
+    regexp: microservices-pact-consumer-(.*).jar$
 ```
 
 ---
@@ -234,23 +239,42 @@ run:
 
 ---
 
-# [https://github.com/concourse?query=resource](https://github.com/concourse?query=resource)
+# Built-In Resources
+## [http://concourse.ci/resource-types.html](http://concourse.ci/resource-types.html)
 
-- pool
-- git
-- vagrant-cloud
-- docker-image
-- cf
-- s3
-- cf service-broker
-- bosh-deployment
-- bosh-io-release
-- bosh-io-stemcell
-- pivotal tracker
-- archive (tgz)
-- semver
-- github-release
-- time
+- The git resource can pull and push to git repositories.
+- The time resource can start jobs on a schedule or timestamp outputs.
+- The s3 resource can fetch from and upload to S3 buckets.
+- The archive resource can fetch and extract .tar.gz archives.
+- The semver resource can set or bump version numbers.
+- The github-release resource can fetch and publish versioned GitHub resources.
+- The docker-image resource can fetch, build, and push Docker images
+- The tracker resource can deliver stories and bugs on Pivotal Tracker
+- The pool resource allows you to configure how to serialize use of an external system. This lets you prevent test interference or overwork on shared systems.
+- The cf resource can deploy an application to Cloud Foundry.
+- The bosh-io-release resource can track and fetch new BOSH releases from bosh.io.
+- The bosh-io-stemcell resource can track and fetch new BOSH stemcells from bosh.io.
+- The bosh-deployment resource can deploy BOSH stemcells and releases.
+- The vagrant-cloud resource can fetch and publish Vagrant boxes to Atlas.
+
+---
+
+# Growing List of Community Resources, including:
+## [http://concourse.ci/resource-types.html](http://concourse.ci/resource-types.html)
+
+- Slack
+- Pull Requests
+- Email
+- Bintray
+- Perforce
+- FTP
+- Twitter
+- HipChat
+- Bitbucket
+- Terraform
+- Rsync
+- JIRA
+- Google Drive
 
 ---
 
@@ -276,7 +300,7 @@ resource_types:
 ---
 
 # [fit] Jobs
-# _functions composed of behavior (tasks) and inputs/outputs (resources/other jobs)_
+# [fit] _functions composed of behavior (tasks) and inputs/outputs (resources/other jobs)_
 
 ---
 
@@ -337,6 +361,8 @@ inputs:
 - name: microservices-pact
 - name: pact
 - name: foo-provider-version
+outputs:
+- name: provider-libs
 params:
   TERM: dumb
   PACT_FILE: ../pact/Foo_Consumer-Foo_Provider.json
@@ -356,17 +382,15 @@ run:
 
 ```
 - put: foo-provider
-  params: {from: microservices-pact-provider/build/libs/microservices-pact-provider-.*.jar$}
+  params: {file: provider-libs/microservices-pact-provider-*.jar}
 - put: foo-provider-version
   params: {file: foo-provider-version/number}
 ```
 
-^ - putting things based on location in the inputs
-
 ---
 
 # [fit] Pipelines
-![fit](images/concourse.png)
+![](images/concourse-new-small.jpg)
 
 ---
 
@@ -381,7 +405,7 @@ run:
 ---
 
 # [fit] Learning to Fly
-![fit](images/concourse.png)
+![](images/concourse-new-small.jpg)
 
 ---
 
@@ -409,10 +433,13 @@ jobs:
   - task: say-hello
     config:
       platform: linux
-      image: "docker:///busybox"
+      image_resource:
+        type: docker-image
+        source:
+          repository: busybox
       run:
         path: echo
-        args: ["Hello, world!"]
+        args: ["Hello, World!"]
 ```
 
 ---
@@ -434,7 +461,7 @@ $ fly set-pipeline -p hello-world -c hello-world-pipeline.yml
 ---
 
 # [fit] Let's Play
-![fit](images/concourse.png)
+![](images/concourse-new-small.jpg)
 
 ^ Demonstrate loading the pipeline
 Demonstrate modifying the pipeline
